@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const User = new mongoose.Schema({
   username: { type: String, minlength: 8, unique: true, required: true },
-  password: { type: String, minlength: 8, required: true, unique: true },
+  password: { type: String, minlength: 8, required: true },
   avatar: { type: String },
   coin: {
     type: Number,
@@ -11,6 +11,7 @@ const User = new mongoose.Schema({
       },
       message: (props) => `${props.value} must be a positive number!`,
     },
+    default:0
   },
 });
 module.exports = mongoose.model("users", User);
