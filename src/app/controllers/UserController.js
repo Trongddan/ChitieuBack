@@ -1,6 +1,21 @@
 const User = require("../model/User");
 const bcrypt = require("bcrypt");
+const jwt = require('jsonwebtoken');
 const UserController = {
+  // sinh ra ma token:
+  generateAccessToken: (user) => {
+    return jwt.sign({
+      id: user._id,
+      admin: user.isAdmin
+    }, "dankenvil", { expiresIn: "30d" })
+  },
+  // sinh ma refresh token
+  generateRefreshToken: (user) => {
+    return jwt.sign({
+      id: user._id,
+      admin: user.isAdmin
+    }, "dankenvil", { expiresIn: "30d" })
+  },
   //dang ki
   register: async (req, res) => {
     try {
@@ -28,9 +43,15 @@ const UserController = {
         const password = req.body.password;
         const ispass = bcrypt.compareSync(password, userFound.password);
         if (ispass) {
+          const accessToken = UserController.generateAccessToken(userFound)
+          const { password, ...other } = userFound._doc
           res
             .status(200)
+<<<<<<< HEAD
             .json({ ...userFound._doc, ...{ mess: "đăng nhập thành công" } });
+=======
+            .json({ ...other, accessToken, ...{ mess: "đăng nhập thành công" } });
+>>>>>>> 1240458287d998c8de25d7139bcd957cdfa20559
         } else {
           res.status(404).json({ mess: "Mật khẩu không chính xác" });
         }
@@ -58,6 +79,16 @@ const UserController = {
       res.status(500).json({ mess: "Thêm ngân sách thất bại" });
     }
   },
+  // lay thong tin user qua Id
+  getUserByID: async (req, res) => {
+    try {
+      const userId = req.params.id;
+      const userFound = await User.findById(userId);
+      res.status(200).json(userFound)
+    } catch (error) {
+      res.status(500).json({ mess: "Không có user" });
+    }
+  }
 };
 
 module.exports = UserController;
