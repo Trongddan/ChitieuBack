@@ -30,7 +30,7 @@ const UserController = {
         if (ispass) {
           res
             .status(200)
-            .json({ ...userFound, ...{ mess: "đăng nhập thành công" } });
+            .json({ ...userFound._doc, ...{ mess: "đăng nhập thành công" } });
         } else {
           res.status(404).json({ mess: "Mật khẩu không chính xác" });
         }
