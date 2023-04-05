@@ -2,11 +2,11 @@ const mongoose = require("mongoose");
 const Database = {
   connect: () => {
     mongoose.connect(
-      "mongodb+srv://danken:dankenvil@chitieu.iwa4cmj.mongodb.net/?retryWrites=true&w=majority",
-      () => {
-        console.log("connected success");
-      }
-    );
+      "mongodb://127.0.0.1:27017/chitieu",
+      
+    ).then(() => {
+      console.log("connected success");
+    }).catch((err)=>console.log(err))
   },
 };
 module.exports = Database;
