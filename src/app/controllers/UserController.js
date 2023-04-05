@@ -47,11 +47,7 @@ const UserController = {
           const { password, ...other } = userFound._doc
           res
             .status(200)
-<<<<<<< HEAD
-            .json({ ...userFound._doc, ...{ mess: "đăng nhập thành công" } });
-=======
             .json({ ...other, accessToken, ...{ mess: "đăng nhập thành công" } });
->>>>>>> 1240458287d998c8de25d7139bcd957cdfa20559
         } else {
           res.status(404).json({ mess: "Mật khẩu không chính xác" });
         }

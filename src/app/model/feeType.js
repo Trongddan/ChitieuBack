@@ -7,4 +7,3 @@ const FeeType = new mongoose.Schema(
   { timestamps: true }
 );
 module.exports = mongoose.model("feetype", FeeType);
-yield
