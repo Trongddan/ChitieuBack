@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const Database = {
   connect: () => {
     mongoose.connect(
-      "mongodb://127.0.0.1:27017/chitieu",
+      "mongodb+srv://doantrongdan:dankenvil@cluster0.rmgfe1g.mongodb.net/?retryWrites=true&w=majority",
       
     ).then(() => {
       console.log("connected success");
