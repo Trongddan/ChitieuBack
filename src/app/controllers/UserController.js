@@ -75,6 +75,24 @@ const UserController = {
       res.status(500).json({ mess: "Thêm ngân sách thất bại" });
     }
   },
+  //cập nhật coin khi thêm bill
+  updateCoin: async (req, res) => {
+    try {
+      const id = req.params.id;
+      const userFound = await User.findById(id);
+      if (userFound) {
+          const totalRemain =   Number(userFound.coin)- Number(req.body.coin);
+          await userFound.updateOne({
+            $set: { coin: totalRemain },
+          });
+          res.status(200).json({ mess: "Thêm ngân sách thành công" });
+      } else {
+        res.status(404).json({ mess: "người dùng không tồn tại" });
+      }
+    } catch (error) {
+      res.status(500).json({ mess: "Thêm ngân sách thất bại" });
+    }
+  },
   // lay thong tin user qua Id
   getUserByID: async (req, res) => {
     try {
