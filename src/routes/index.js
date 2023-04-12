@@ -1,7 +1,7 @@
 const userRoute = require("./userRoute");
-const feeRouter = require("./feeRoute")
-const Route=(app)=> {
+const expensesRoute = require("./ExpensesRoute");
+const Route = (app) => {
   app.use("/user", userRoute);
-  app.use("/fee",feeRouter)
-}
+  app.use("/exp", expensesRoute);
+};
 module.exports = Route;
