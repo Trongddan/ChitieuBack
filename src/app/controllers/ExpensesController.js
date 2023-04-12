@@ -1,6 +1,6 @@
 const Expenses = require("../model/Expenses");
 const ExpensesController = {
-  addFeeType: async (req, res) => {
+  addExp: async (req, res) => {
     try {
       const newFee = await new Expenses(req.body);
       await newFee.save();
