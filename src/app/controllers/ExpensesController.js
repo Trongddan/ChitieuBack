@@ -11,7 +11,13 @@ const ExpensesController = {
   },
   getAllFeetype: async (req, res) => {
     try {
-      const listfee = await Expenses.find();
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // set giờ phút giây về 0 để lấy ngày đầu tiên của ngày hôm nay
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1); // lấy ngày hôm sau để sử dụng trong truy vấn
+      const listfee = await Expenses.find({
+        createdAt: { $gte: today, $lt: tomorrow },
+      });
       res.status(200).json(listfee);
     } catch (error) {
       res.status(500).json(error);
