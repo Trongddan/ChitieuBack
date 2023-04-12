@@ -5,5 +5,5 @@ Router.post("/register", UserController.register);
 Router.post("/login", UserController.login);
 Router.get("/getuser/:id",UserController.getUserByID)
 Router.put("/add-coin/:id", UserController.addCoin);
-Router.put("/add-coin/:id", UserController.updateCoin);
+Router.put("/update-coin/:id", UserController.updateCoin);
 module.exports = Router;
