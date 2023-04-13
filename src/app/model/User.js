@@ -11,8 +11,11 @@ const User = new mongoose.Schema({
       },
       message: (props) => `${props.value} must be a positive number!`,
     },
-    default:0
+    default: 0,
   },
-  isAdmin:{type:Boolean, default:false}
+  expenses: [
+    { type: mongoose.Schema.Types.ObjectId, ref: "expenses", default: [] },
+  ],
+  isAdmin: { type: Boolean, default: false },
 });
 module.exports = mongoose.model("users", User);
