@@ -8,8 +8,8 @@ const ExpensesController = {
       if (userFound) {
         const savedFee = await newFee.save();
         await userFound.updateOne({ $push: { expenses: savedFee._id } });
+        res.status(200).json({ mess: "Đã thêm mới khoản chi" });
       }
-      res.status(200).json({ mess: "Đã thêm mới khoản chi" });
     } catch (error) {
       res.status(500).json({ mess: "Thêm mới thất bại!" });
     }
