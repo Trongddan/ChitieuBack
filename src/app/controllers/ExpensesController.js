@@ -4,10 +4,10 @@ const ExpensesController = {
   addExp: async (req, res) => {
     try {
       const newFee = await new Expenses(req.body);
-      const userFound = await User.findById(req.body.userId);
+      const userFound = await User.findOne({ _id: req.body.userId });
       if (userFound) {
-        const savedFee = await newFee.save();
-        await userFound.updateOne({ $push: { expenses: savedFee._id } });
+        await newFee.save();
+        await userFound.updateOne({ $push: { expenses: newFee._id } });
         res.status(200).json({ mess: "Đã thêm mới khoản chi" });
       }
     } catch (error) {

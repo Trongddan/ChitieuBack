@@ -13,9 +13,7 @@ const User = new mongoose.Schema({
     },
     default: 0,
   },
-  expenses: [
-    { type: mongoose.Schema.Types.ObjectId, ref: "expenses", default: [] },
-  ],
+  expenses: [{ type: mongoose.Schema.Types.ObjectId, ref: "expenses" }],
   isAdmin: { type: Boolean, default: false },
 });
 module.exports = mongoose.model("users", User);
