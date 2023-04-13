@@ -16,18 +16,28 @@ const UserController = {
       admin: user.isAdmin
     }, "dankenvil", { expiresIn: "30d" })
   },
-  //dang ki
   register: async (req, res) => {
     try {
-      const salt = await bcrypt.genSalt(10);
-      const hashed = await bcrypt.hash(req.body.password, salt);
+      const username = req.body.username;
+      const password = req.body.password;
+      if (username.length < 8 || password.length < 8) {
+        return res.status(500).json({
+          mess: "username and password must have more than 8 characters",
+        });
+      }
+      const userFound = await User.findOne({ username: username });
+      if (userFound) {
+        return res.status(400).json({ mess: "Account is existed" });
+      }
+
+      const salt = await bcr.genSalt(10);
+      const hashed = await bcr.hash(password, salt);
       const newUser = await new User({
-        username: req.body.username,
+        username: username,
         password: hashed,
       });
-      console.log(newUser);
-      const saved = await newUser.save();
-      res.status(200).json({ mess: "Đăng ký thành công" });
+      await newUser.save();
+      res.status(200).json({ mess: "Register successfully" });
     } catch (error) {
       res.status(500).json(error);
     }
