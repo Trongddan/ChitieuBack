@@ -11,6 +11,6 @@ app.use(express.json());
 app.use(cors({ origin: "*" }));
 Route(app);
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+app.listen(8000, () => {
   console.log("sever is running");
 });

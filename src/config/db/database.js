@@ -3,7 +3,7 @@ const Database = {
   connect: () => {
     mongoose
       .connect(
-        "mongodb+srv://doantrongdan:trongdan123@cluster0.rmgfe1g.mongodb.net/?retryWrites=true&w=majority"
+        "mongodb+srv://doandan301:Trongdan123@blogapp.1kcuawa.mongodb.net/?retryWrites=true&w=majority&appName=blogapp"
       )
       .then(() => {
         console.log("connected success");

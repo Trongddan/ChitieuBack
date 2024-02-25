@@ -1,43 +1,95 @@
-const User = require("../model/User");
-const bcrypt = require("bcryptjs");
+const User = require('../model/User');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const transporter = require('./EmailController');
 const UserController = {
   // sinh ra ma token:
   generateAccessToken: (user) => {
-    return jwt.sign({
-      id: user._id,
-      admin: user.isAdmin
-    }, "dankenvil", { expiresIn: "30d" })
+    return jwt.sign(
+      {
+        id: user._id,
+        admin: user.isAdmin,
+      },
+      'dankenvil',
+      { expiresIn: '30d' }
+    );
+  },
+  generateVerifyToken: (user) => {
+    return jwt.sign(
+      {
+        email: user.email,
+        username: user.username,
+        password: user.password,
+      },
+      'dankenvil',
+      { expiresIn: '5m' }
+    );
   },
   // sinh ma refresh token
   generateRefreshToken: (user) => {
-    return jwt.sign({
-      id: user._id,
-      admin: user.isAdmin
-    }, "dankenvil", { expiresIn: "30d" })
+    return jwt.sign(
+      {
+        id: user._id,
+        admin: user.isAdmin,
+      },
+      'dankenvil',
+      { expiresIn: '30d' }
+    );
+  },
+  createVerifiedAccount: async (req, res) => {
+    try {
+      const newUser = await new User(req.user);
+      await newUser.save();
+      return res.redirect('http://localhost:3000/login');
+    } catch (error) {
+      return res.status(500).json({
+        mess: 'email is required',
+      });
+    }
   },
   register: async (req, res) => {
     try {
       const username = req.body.username;
       const password = req.body.password;
+      const email = req.body.email;
       if (username.length < 8 || password.length < 8) {
         return res.status(500).json({
-          mess: "username and password must have more than 8 characters",
+          mess: 'username and password must have more than 8 characters',
         });
       }
-      const userFound = await User.findOne({ username: username });
-      if (userFound) {
-        return res.status(400).json({ mess: "Account is existed" });
+      if (!email) {
+        return res.status(500).json({
+          mess: 'email is required',
+        });
       }
-
-      const salt = await bcr.genSalt(10);
-      const hashed = await bcr.hash(password, salt);
-      const newUser = await new User({
+      const userFound = await User.findOne({ email: email });
+      if (userFound) {
+        return res.status(400).json({ mess: 'Account is existed' });
+      }
+      const accessToken = UserController.generateVerifyToken({
+        email: email,
         username: username,
-        password: hashed,
+        password: password,
       });
-      await newUser.save();
-      res.status(200).json({ mess: "Register successfully" });
+      transporter.sendMail(
+        {
+          from: 'Code Leader', // sender address
+          to: email, // list of receivers
+          subject: 'Verify Code Leader', // Subject line
+          text: 'Verify Code Leader', // plain text body
+          html: `<p>Please click here to verify account:  <a href="http://localhost:8000/user/verify?token=${accessToken}">Verify</a></p>`, // html body
+        },
+        (err, info) => {
+          if (err) {
+            console.log(err);
+          }
+        }
+      );
+      res
+        .status(200)
+        .json({
+          mess: 'A new message was send to your email. Please check and verify it',
+        });
     } catch (error) {
       res.status(500).json(error);
     }
@@ -48,18 +100,20 @@ const UserController = {
       const username = req.body.username;
       const userFound = await User.findOne({ username: username });
       if (!userFound) {
-        res.status(404).json({ mess: "tài khoản không tồn tại" });
+        res.status(404).json({ mess: 'tài khoản không tồn tại' });
       } else {
         const password = req.body.password;
         const ispass = bcrypt.compareSync(password, userFound.password);
         if (ispass) {
-          const accessToken = UserController.generateAccessToken(userFound)
-          const { password, ...other } = userFound._doc
-          res
-            .status(200)
-            .json({ ...other, accessToken, ...{ mess: "đăng nhập thành công" } });
+          const accessToken = UserController.generateAccessToken(userFound);
+          const { password, ...other } = userFound._doc;
+          res.status(200).json({
+            ...other,
+            accessToken,
+            ...{ mess: 'đăng nhập thành công' },
+          });
         } else {
-          res.status(404).json({ mess: "Mật khẩu không chính xác" });
+          res.status(404).json({ mess: 'Mật khẩu không chính xác' });
         }
       }
     } catch (error) {
@@ -77,12 +131,12 @@ const UserController = {
         await userFound.updateOne({
           $set: { coin: total },
         });
-        res.status(200).json({ mess: "Thêm ngân sách thành công" });
+        res.status(200).json({ mess: 'Thêm ngân sách thành công' });
       } else {
-        res.status(404).json({ mess: "người dùng không tồn tại" });
+        res.status(404).json({ mess: 'người dùng không tồn tại' });
       }
     } catch (error) {
-      res.status(500).json({ mess: "Thêm ngân sách thất bại" });
+      res.status(500).json({ mess: 'Thêm ngân sách thất bại' });
     }
   },
   //cập nhật coin khi thêm bill
@@ -91,16 +145,16 @@ const UserController = {
       const id = req.params.id;
       const userFound = await User.findById(id);
       if (userFound) {
-          const totalRemain =   Number(userFound.coin)- Number(req.body.coin);
-          await userFound.updateOne({
-            $set: { coin: totalRemain },
-          });
-          res.status(200).json({ mess: "Thêm ngân sách thành công" });
+        const totalRemain = Number(userFound.coin) - Number(req.body.coin);
+        await userFound.updateOne({
+          $set: { coin: totalRemain },
+        });
+        res.status(200).json({ mess: 'Thêm ngân sách thành công' });
       } else {
-        res.status(404).json({ mess: "người dùng không tồn tại" });
+        res.status(404).json({ mess: 'người dùng không tồn tại' });
       }
     } catch (error) {
-      res.status(500).json({ mess: "Thêm ngân sách thất bại" });
+      res.status(500).json({ mess: 'Thêm ngân sách thất bại' });
     }
   },
   // lay thong tin user qua Id
@@ -108,11 +162,11 @@ const UserController = {
     try {
       const userId = req.params.id;
       const userFound = await User.findById(userId);
-      res.status(200).json(userFound)
+      res.status(200).json(userFound);
     } catch (error) {
-      res.status(500).json({ mess: "Không có user" });
+      res.status(500).json({ mess: 'Không có user' });
     }
-  }
+  },
 };
 
 module.exports = UserController;
