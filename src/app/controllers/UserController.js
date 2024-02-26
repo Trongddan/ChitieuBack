@@ -38,6 +38,9 @@ const UserController = {
   },
   createVerifiedAccount: async (req, res) => {
     try {
+      const genSalt = await bcrypt.genSalt(10);
+      const password = await bcrypt.hash(req.user.password, genSalt);
+      req.user.password = password;
       const newUser = await new User(req.user);
       await newUser.save();
       return res.redirect('http://localhost:3000/login');
@@ -54,17 +57,17 @@ const UserController = {
       const email = req.body.email;
       if (username.length < 8 || password.length < 8) {
         return res.status(500).json({
-          mess: 'username and password must have more than 8 characters',
+          mess: 'username và password phải có ít nhất 8 ký tự',
         });
       }
       if (!email) {
         return res.status(500).json({
-          mess: 'email is required',
+          mess: 'Vui lòng nhập email',
         });
       }
       const userFound = await User.findOne({ email: email });
       if (userFound) {
-        return res.status(400).json({ mess: 'Account is existed' });
+        return res.status(400).json({ mess: 'Tài khoản đã tồn tại' });
       }
       const accessToken = UserController.generateVerifyToken({
         email: email,
@@ -85,11 +88,9 @@ const UserController = {
           }
         }
       );
-      res
-        .status(200)
-        .json({
-          mess: 'A new message was send to your email. Please check and verify it',
-        });
+      res.status(200).json({
+        mess: `Một tin nhắn đã được gửi tới email: ${email}. Vui lòng kiểm tra`,
+      });
     } catch (error) {
       res.status(500).json(error);
     }
@@ -98,7 +99,9 @@ const UserController = {
   login: async (req, res) => {
     try {
       const username = req.body.username;
-      const userFound = await User.findOne({ username: username });
+      const userFound = await User.findOne({
+        $or: [{ username: username }, { email: username }],
+      });
       if (!userFound) {
         res.status(404).json({ mess: 'tài khoản không tồn tại' });
       } else {
