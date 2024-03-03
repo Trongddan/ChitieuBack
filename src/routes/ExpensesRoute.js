@@ -1,7 +1,7 @@
-const Router = require("express").Router();
-const middlaware = require("../app/middlaware/middlaware");
-const ExpensesController = require("../app/controllers/ExpensesController");
-Router.get("/all-exp/:userId", ExpensesController.getAllFeetype);
-Router.post("/add-exp", ExpensesController.addExp);
+// import Router from "express";
+// import middlaware from "../app/middlaware/middlaware.js";
+// import ExpensesController from "../app/controllers/ExpensesController.js";
+// Router.Router().get("/all-exp/:userId", ExpensesController.getAllFeetype);
+// Router.Router().post("/add-exp", ExpensesController.addExp);
 
-module.exports = Router;
+// export default Router;

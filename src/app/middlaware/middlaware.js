@@ -1,4 +1,4 @@
-const jwt = require('jsonwebtoken');
+import jwt from'jsonwebtoken';
 const middlaware = {
   verifyToken: (req, res, next) => {
     const token = req.headers.authorization;
@@ -40,4 +40,4 @@ const middlaware = {
     });
   },
 };
-module.exports = middlaware;
+export default middlaware;

@@ -1,9 +1,13 @@
-const userRoute = require("./userRoute");
-const expensesRoute = require("./ExpensesRoute");
-const BookRoute = require('./BookRoute')
+import userRoute from './userRoute.js';
+import cateRoute from './CategoryRoute.js';
+import postRoute from './PostRoute.js';
+// import expensesRoute from"./ExpensesRoute.js";
+// import BookRoute  from'./BookRoute.js'
 const Route = (app) => {
-  app.use("/user", userRoute);
-  app.use("/exp", expensesRoute);
-  app.use("/book",BookRoute)
+  app.use('/user', userRoute);
+  app.use('/api/cate', cateRoute);
+  app.use('/api/post', postRoute);
+  // app.use("/exp", expensesRoute);
+  // app.use("/book",BookRoute)
 };
-module.exports = Route;
+export default Route;

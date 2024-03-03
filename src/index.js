@@ -1,16 +1,21 @@
-const express = require("express");
-const Database = require("./config/db/database");
-const Route = require("./routes/index");
-const morgan = require("morgan");
-const cors = require("cors");
-const app = express();
-Database.connect();
+import express from 'express';
+import { Database } from './config/db/database.js';
+import Route from './routes/index.js';
+import morgan from 'morgan';
+import cors from 'cors';
+import bodyParser from 'body-parser';
 
-app.use(morgan("common"));
-app.use(express.json());
-app.use(cors({ origin: "*" }));
+Database.connect();
+const app = express();
+
+app.use(morgan('common'));
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(cors({ origin: '*' }));
+
 Route(app);
+
 const PORT = process.env.PORT || 3000;
 app.listen(8000, () => {
-  console.log("sever is running");
+  console.log('Server is running on port 8000');
 });

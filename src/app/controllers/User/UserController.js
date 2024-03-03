@@ -1,7 +1,7 @@
-const User = require('../model/User');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const transporter = require('./EmailController');
+import User from '../../model/User.js';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import transporter from '../EmailController.js';
 const UserController = {
   // sinh ra ma token:
   generateAccessToken: (user) => {
@@ -59,16 +59,16 @@ const UserController = {
       const name = req.body.name;
       const password = req.body.password;
       const email = req.body.email;
-      if (name.length < 8 || password.length < 8) {
-        return res.status(500).json({
-          mess: 'name và password phải có ít nhất 8 ký tự',
-        });
-      }
-      if (!email) {
-        return res.status(500).json({
-          mess: 'Vui lòng nhập email',
-        });
-      }
+      // if (name.length < 8 || password.length < 8) {
+      //   return res.status(500).json({
+      //     mess: 'name và password phải có ít nhất 8 ký tự',
+      //   });
+      // }
+      // if (!email) {
+      //   return res.status(500).json({
+      //     mess: 'Vui lòng nhập email',
+      //   });
+      // }
       const userFound = await User.findOne({ email: email });
       if (userFound) {
         return res.status(400).json({ mess: 'Tài khoản đã tồn tại' });
@@ -214,4 +214,4 @@ const UserController = {
   },
 };
 
-module.exports = UserController;
+export default UserController;

@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose  from "mongoose";
 const Database = {
   connect: () => {
     mongoose
@@ -11,4 +11,4 @@ const Database = {
       .catch((err) => console.log(err));
   },
 };
-module.exports = Database;
+export {Database}
