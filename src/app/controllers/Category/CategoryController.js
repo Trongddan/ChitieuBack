@@ -2,10 +2,10 @@ import Category from '../../model/Category.js';
 const CategoryController = {
   addCate: async (req, res) => {
     try {
-      const cateFound = await Category.find({ name: req.name });
-      if (cateFound) {
-        return res.status(400).json({ mess: 'Danh mục đã tồn tại' });
-      }
+      // const cateFound = await Category.find({ name: req.name });
+      // if (cateFound) {
+      //   return res.status(400).json({ mess: 'Danh mục đã tồn tại' });
+      // }
       const newCate = await new Category(req.body);
       await newCate.save();
       return res.status(200).json({ mess: 'Thêm thành công' });
