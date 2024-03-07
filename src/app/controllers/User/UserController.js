@@ -59,16 +59,6 @@ const UserController = {
       const name = req.body.name;
       const password = req.body.password;
       const email = req.body.email;
-      // if (name.length < 8 || password.length < 8) {
-      //   return res.status(500).json({
-      //     mess: 'name và password phải có ít nhất 8 ký tự',
-      //   });
-      // }
-      // if (!email) {
-      //   return res.status(500).json({
-      //     mess: 'Vui lòng nhập email',
-      //   });
-      // }
       const userFound = await User.findOne({ email: email });
       if (userFound) {
         return res.status(400).json({ mess: 'Tài khoản đã tồn tại' });
@@ -145,7 +135,7 @@ const UserController = {
         email: email,
       });
       if (!userFound) {
-        res.status(404).json({ mess: 'tài khoản không tồn tại' });
+       return res.status(404).json({ mess: 'tài khoản không tồn tại' });
       } else {
         const password = req.body.password;
         const ispass = bcrypt.compareSync(password, userFound.password);
