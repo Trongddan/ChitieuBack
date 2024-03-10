@@ -18,5 +18,6 @@ Router.put(
   upload.fields([{ name: 'picture', maxCount: 1 }]),
   PostController.updatePost
 );
-Router.get('/get-post-by-cate/:cateId', PostController.getPostByCategoryId);
+Router.get('/get-post', PostController.getListPost);
+Router.get('/get-detail/:id', PostController.getPostById);
 export default Router;

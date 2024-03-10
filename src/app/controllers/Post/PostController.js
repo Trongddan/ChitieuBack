@@ -30,6 +30,7 @@ const PostController = {
       await newPost.save();
       return res.status(200).json('Thêm thành công');
     } catch (error) {
+      console.log(error);
       return res.status(500).json('that bai');
     }
   },
@@ -67,26 +68,53 @@ const PostController = {
       await postFound.updateOne({ $set: body });
       res.status(200).json('update thành công');
     } catch (error) {
+      console.log(error);
       return res.status(500).json('Thất bại');
     }
   },
   // get film by Theme
-  getPostByCategoryId: async (req, res) => {
+  getListPost: async (req, res) => {
     try {
-      const postList = await Post.find({categoryId:req.params.cateId})
-      console.log(postList)
+      const category = req.query.categoryId;
+      const postName = req.query.name;
+      const dateStr = req.query.date; // Get date as string first
+
+      const query = {}; // Initialize an empty query object
+
+      // Dynamically add filter conditions based on query parameters:
+      if (category) {
+        query.categoryId = category;
+      }
+
+      if (postName) {
+        query.title = { $regex: postName };
+      }
+
+      if (dateStr) {
+        const date = new Date(dateStr);
+        date.setHours(0, 0, 0, 0); // Start of day
+        const nextDay = new Date(date);
+        nextDay.setDate(date.getDate() + 1);
+        nextDay.setHours(0, 0, 0, 0); // Start of next day
+        query.createdAt = { $gte: date, $lt: nextDay };
+      }
+
+      const postList = await Post.find(query).populate('categoryId');
       res.status(200).json(postList);
     } catch (error) {
+      console.log(error);
       res.status(500).json(error);
     }
   },
-  // getAllPost: async (req, res) => {
-  //   try {
-  //     const PostgoryList = await Category.find();
-  //     res.status(200).json(CategoryList);
-  //   } catch (error) {
-  //     return res.status(500).json('that bai');
-  //   }
-  // },
+  getPostById: async (req, res) => {
+    try {
+      const postDetail = await Post.find({ _id: req.params.id }).populate(
+        'categoryId'
+      );
+      res.status(200).json(postDetail);
+    } catch (error) {
+      return res.status(500).json('that bai');
+    }
+  },
 };
 export default PostController;
