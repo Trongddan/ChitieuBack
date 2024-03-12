@@ -1,7 +1,8 @@
-import User from '../../model/User.js';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import transporter from '../EmailController.js';
+import User from "../../model/User.js";
+import { OAuth2Client } from "google-auth-library";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import transporter from "../EmailController.js";
 const UserController = {
   // sinh ra ma token:
   generateAccessToken: (user) => {
@@ -10,8 +11,8 @@ const UserController = {
         id: user._id,
         admin: user.isAdmin,
       },
-      'dankenvil',
-      { expiresIn: '30d' }
+      "dankenvil",
+      { expiresIn: "30d" }
     );
   },
 
@@ -22,8 +23,8 @@ const UserController = {
         name: user.name,
         password: user.password,
       },
-      'dankenvil',
-      { expiresIn: '5m' }
+      "dankenvil",
+      { expiresIn: "5m" }
     );
   },
 
@@ -34,8 +35,8 @@ const UserController = {
         id: user._id,
         admin: user.isAdmin,
       },
-      'dankenvil',
-      { expiresIn: '30d' }
+      "dankenvil",
+      { expiresIn: "30d" }
     );
   },
 
@@ -46,10 +47,10 @@ const UserController = {
       req.user.password = password;
       const newUser = await new User(req.user);
       await newUser.save();
-      return res.redirect('http://localhost:3000/login');
+      return res.redirect("http://localhost:3000/login");
     } catch (error) {
       return res.status(500).json({
-        mess: 'email is required',
+        mess: "email is required",
       });
     }
   },
@@ -61,7 +62,7 @@ const UserController = {
       const email = req.body.email;
       const userFound = await User.findOne({ email: email });
       if (userFound) {
-        return res.status(400).json({ mess: 'Tài khoản đã tồn tại' });
+        return res.status(400).json({ mess: "Tài khoản đã tồn tại" });
       }
       const accessToken = UserController.generateVerifyToken({
         email: email,
@@ -70,10 +71,10 @@ const UserController = {
       });
       transporter.sendMail(
         {
-          from: 'Code Leader', // sender address
+          from: "Code Leader", // sender address
           to: email, // list of receivers
-          subject: 'Verify Code Leader', // Subject line
-          text: 'Verify Code Leader', // plain text body
+          subject: "Verify Code Leader", // Subject line
+          text: "Verify Code Leader", // plain text body
           html: `<p>Please click here to verify account:  <a href="http://localhost:8000/user/verify?token=${accessToken}">Verify</a></p>`, // html body
         },
         (err, info) => {
@@ -95,34 +96,44 @@ const UserController = {
       const email = req.body.email;
       const password = Math.random(10).toString();
       const avatar = req.body.avatar;
+      const tokenID = req.body.tokenID;
       const userFound = await User.findOne({
         email: email,
       });
+      const client = new OAuth2Client();
+      const ticket = await client.verifyIdToken({
+        idToken: tokenID,
+        audience:
+          "155669233890-1iuvq0nskb2bge26l4p5jcg52nvb06hj.apps.googleusercontent.com",
+      });
       if (userFound) {
-        const accessToken = UserController.generateAccessToken(userFound);
+        if (ticket.payload.email_verified) {
+          const accessToken = UserController.generateAccessToken(userFound);
+          return res.status(200).json({
+            mess: "Login thành công",
+            user: userFound,
+            accessToken: accessToken,
+          });
+        }
+      }
+      if (ticket.payload.email_verified) {
+        const genSalt = await bcrypt.genSalt(10);
+        const hashPassword = await bcrypt.hash(password, genSalt);
+        const newUser = await new User({
+          name: name,
+          password: hashPassword,
+          email: email,
+          avatar: avatar,
+        });
+
+        const user = await newUser.save();
+        const accessToken = UserController.generateAccessToken(user);
         return res.status(200).json({
-          mess: 'Login thành công',
-          user: userFound,
+          mess: "đăng ký thành công",
+          user: newUser,
           accessToken: accessToken,
         });
       }
-
-      const genSalt = await bcrypt.genSalt(10);
-      const hashPassword = await bcrypt.hash(password, genSalt);
-      const newUser = await new User({
-        name: name,
-        password: hashPassword,
-        email: email,
-        avatar: avatar,
-      });
-
-      const user = await newUser.save();
-      const accessToken = UserController.generateAccessToken(user);
-      return res.status(200).json({
-        mess: 'đăng ký thành công',
-        user: newUser,
-        accessToken: accessToken,
-      });
     } catch (error) {
       res.status(500).json(error);
     }
@@ -135,7 +146,7 @@ const UserController = {
         email: email,
       });
       if (!userFound) {
-       return res.status(404).json({ mess: 'tài khoản không tồn tại' });
+        return res.status(404).json({ mess: "tài khoản không tồn tại" });
       } else {
         const password = req.body.password;
         const ispass = bcrypt.compareSync(password, userFound.password);
@@ -145,10 +156,10 @@ const UserController = {
           res.status(200).json({
             ...other,
             accessToken,
-            ...{ mess: 'đăng nhập thành công' },
+            ...{ mess: "đăng nhập thành công" },
           });
         } else {
-          res.status(404).json({ mess: 'Mật khẩu không chính xác' });
+          res.status(404).json({ mess: "Mật khẩu không chính xác" });
         }
       }
     } catch (error) {
@@ -166,12 +177,12 @@ const UserController = {
         await userFound.updateOne({
           $set: { coin: total },
         });
-        res.status(200).json({ mess: 'Thêm ngân sách thành công' });
+        res.status(200).json({ mess: "Thêm ngân sách thành công" });
       } else {
-        res.status(404).json({ mess: 'người dùng không tồn tại' });
+        res.status(404).json({ mess: "người dùng không tồn tại" });
       }
     } catch (error) {
-      res.status(500).json({ mess: 'Thêm ngân sách thất bại' });
+      res.status(500).json({ mess: "Thêm ngân sách thất bại" });
     }
   },
   //cập nhật coin khi thêm bill
@@ -184,12 +195,12 @@ const UserController = {
         await userFound.updateOne({
           $set: { coin: totalRemain },
         });
-        res.status(200).json({ mess: 'Thêm ngân sách thành công' });
+        res.status(200).json({ mess: "Thêm ngân sách thành công" });
       } else {
-        res.status(404).json({ mess: 'người dùng không tồn tại' });
+        res.status(404).json({ mess: "người dùng không tồn tại" });
       }
     } catch (error) {
-      res.status(500).json({ mess: 'Thêm ngân sách thất bại' });
+      res.status(500).json({ mess: "Thêm ngân sách thất bại" });
     }
   },
   // lay thong tin user qua Id
@@ -199,7 +210,7 @@ const UserController = {
       const userFound = await User.findById(userId);
       res.status(200).json(userFound);
     } catch (error) {
-      res.status(500).json({ mess: 'Không có user' });
+      res.status(500).json({ mess: "Không có user" });
     }
   },
 };
