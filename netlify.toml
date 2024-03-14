@@ -1,2 +1,2 @@
-[functions]
-command = "npm start"
+[build]
+functions:"functions"
