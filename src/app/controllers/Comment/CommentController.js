@@ -4,13 +4,14 @@ const CommentController = {
   addComment: async (req, res) => {
     try {
       const body = req.body;
-      const newComment = await new Comment(body);
+      const newComment = await new Comment(body).populate("userId");
       await newComment.save();
       await Post.updateOne(
         { _id: body.postId },
         { $inc: { numberComment: 1 } }
       );
-      return res.status(200).json({ mess: "Thêm thành công" });
+
+      return res.status(200).json(newComment);
     } catch (error) {
       return res.status(500).json({ err: "something went wrong!" });
     }
@@ -30,7 +31,12 @@ const CommentController = {
   },
   deleteComment: async (req, res) => {
     try {
-      const commentFound = await Comment.findByIdAndRemove(req.params.id);
+      const cmtId_postId = req.params.id.split("_");
+      const commentFound = await Comment.findByIdAndRemove(cmtId_postId[0]);
+      await Post.updateOne(
+        { _id: cmtId_postId[1] },
+        { $inc: { numberComment: -1 } }
+      );
       return res.status(200).json({ mess: "Xoá thành công" });
     } catch (error) {
       return res.status(500).json({ err: "something went wrong!" });

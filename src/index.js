@@ -25,7 +25,7 @@ app.use(cors({ origin: "*" }));
 Route(app);
 socketIo.on("connection", (socket) => {
   socket.on("clientCommentPost", function (data) {
-    socket.broadcast.emit(data.postId, {data});
+    socket.broadcast.emit(data.postId, { data });
     // phát sự kiện  có tên sendDataServer cùng với dữ liệu tin nhắn từ phía server
   });
   socket.on("disconnect", () => {

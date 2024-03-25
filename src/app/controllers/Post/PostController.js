@@ -118,9 +118,12 @@ const PostController = {
   },
   getPostById: async (req, res) => {
     try {
-      const postDetail = await Post.find({ _id: req.params.id }).populate(
-        "categoryId"
-      );
+      const postDetail = await Post.findOneAndUpdate(
+        { _id: req.params.id },
+        { $inc: { numberView: 1 } },
+        { new: true } // Optionally, return the updated document
+      ).populate("categoryId");
+
       res.status(200).json(postDetail);
     } catch (error) {
       return res.status(500).json("that bai");
