@@ -1,21 +1,26 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 const PostModel = mongoose.Schema(
   {
     title: { type: String, required: true },
     picture: { type: String, required: true },
     content: { type: String, required: true },
     numberView: { type: Number, default: 0 },
+    numberComment: { type: Number, default: 0 },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'users',
+      ref: "users",
       required: true,
     },
     categoryId: [
-      { type: mongoose.Schema.Types.ObjectId, ref: 'categories', required: true},
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "categories",
+        required: true,
+      },
     ],
   },
   { timestamps: true }
 );
-const Post = mongoose.model('posts', PostModel);
+const Post = mongoose.model("posts", PostModel);
 
 export default Post;

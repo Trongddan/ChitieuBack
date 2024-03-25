@@ -107,10 +107,10 @@ const PostController = {
         .populate("categoryId")
         .skip(skip)
         .limit(limit);
+
       const totalDocs = await Post.find(query).countDocuments();
       const totalPages = Math.ceil(totalDocs / limit);
       res.status(200).json({ totalPages: totalPages, data: postList });
-      
     } catch (error) {
       console.log(error);
       res.status(500).json(error);

@@ -1,11 +1,15 @@
 import Comment from "../../model/Comment.js";
-
+import Post from "../../model/Post.js";
 const CommentController = {
   addComment: async (req, res) => {
     try {
       const body = req.body;
       const newComment = await new Comment(body);
       await newComment.save();
+      await Post.updateOne(
+        { _id: body.postId },
+        { $inc: { numberComment: 1 } }
+      );
       return res.status(200).json({ mess: "Thêm thành công" });
     } catch (error) {
       return res.status(500).json({ err: "something went wrong!" });
