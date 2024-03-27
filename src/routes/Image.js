@@ -7,22 +7,9 @@ import upload from "../app/middlaware/upload.js";
 
 const Router = express.Router();
 Router.post(
-  "/add-post",
-  validate(PostSchema),
+  "/add-image",
+  upload.fields([{ name: "picture", maxCount: 1 }]),
   middlaware.verifyToken,
-  PostController.addPost
+  PostController.uploadImage
 );
-Router.delete(
-  "/delete-post/:id",
-  middlaware.verifyToken,
-  PostController.deletePost
-);
-Router.put(
-  "/update-post/:id",
-  validate(PostSchema),
-  middlaware.verifyToken,
-  PostController.updatePost
-);
-Router.get("/get-post", PostController.getListPost);
-Router.get("/get-detail/:id", PostController.getPostById);
 export default Router;

@@ -11,22 +11,8 @@ const PostController = {
         numberView: req.body.numberView,
         userId: req.body.userId,
         categoryId: categoryId,
-        picture: null,
+        picture: req.body.picture,
       });
-      await cloud.uploader.upload(
-        req.files.picture[0].path,
-        {
-          resource_type: "image",
-          folder: "codeleader",
-          public_id: path.basename(req.files.picture[0].path),
-        },
-        (err, result) => {
-          if (err) {
-            return res.status(500).json("có lỗi xảy ra");
-          }
-          newPost.picture = result.url;
-        }
-      );
       await newPost.save();
       return res.status(200).json("Thêm thành công");
     } catch (error) {
@@ -47,22 +33,6 @@ const PostController = {
       const body = req.body;
       if (body.categoryId) {
         body.categoryId = body.categoryId.split(",");
-      }
-      if (req.files) {
-        await cloud.uploader.upload(
-          req.files.picture[0].path,
-          {
-            resource_type: "image",
-            folder: "codeleader",
-            public_id: path.basename(req.files.picture[0].path),
-          },
-          (err, result) => {
-            if (err) {
-              return res.status(500).json("có lỗi xảy ra");
-            }
-            body.picture = result.url;
-          }
-        );
       }
       const postFound = await Post.findById(req.params.id);
       await postFound.updateOne({ $set: body });
@@ -127,6 +97,28 @@ const PostController = {
       res.status(200).json(postDetail);
     } catch (error) {
       return res.status(500).json("that bai");
+    }
+  },
+  uploadImage: async (req, res) => {
+    try {
+      if (req.files) {
+        await cloud.uploader.upload(
+          req.files.picture[0].path,
+          {
+            resource_type: "image",
+            folder: "codeleader",
+            public_id: path.basename(req.files.picture[0].path),
+          },
+          (err, result) => {
+            if (err) {
+              return res.status(500).json("có lỗi xảy ra");
+            }
+            return res.status(200).json({ url: result.url });
+          }
+        );
+      }
+    } catch (error) {
+      return res.status(error);
     }
   },
 };

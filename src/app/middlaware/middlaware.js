@@ -1,33 +1,33 @@
-import jwt from'jsonwebtoken';
+import jwt from "jsonwebtoken";
 const middlaware = {
   verifyToken: (req, res, next) => {
     const token = req.headers.authorization;
-    const accessToken = token.split(' ')[1];
+    const accessToken = token?.split(" ")[1];
     if (token) {
-      jwt.verify(accessToken, 'dankenvil', (err, user) => {
+      jwt.verify(accessToken, "dankenvil", (err, user) => {
         if (err) {
-          res.status(403).json({ mess: 'mã token không hợp lệ' });
+          res.status(403).json({ mess: "mã token không hợp lệ" });
         }
         console.log(user);
         req.user = user;
         next();
       });
     } else {
-      res.status(401).json({ mess: 'Bạn không có quyền' });
+      res.status(401).json({ mess: "Bạn không có quyền" });
     }
   },
   verifyTokenEmail: (req, res, next) => {
     const token = req.query.token;
     if (token) {
-      jwt.verify(token, 'dankenvil', (err, user) => {
+      jwt.verify(token, "dankenvil", (err, user) => {
         if (err) {
-          res.status(403).json({ mess: 'mã token không hợp lệ' });
+          res.status(403).json({ mess: "mã token không hợp lệ" });
         }
         req.user = user;
         next();
       });
     } else {
-      res.status(401).json({ mess: 'Bạn không có quyền' });
+      res.status(401).json({ mess: "Bạn không có quyền" });
     }
   },
   verifyTokenUser: (req, res, next) => {
@@ -35,7 +35,7 @@ const middlaware = {
       if (req.user.id === req.params.id || req.user.admin) {
         next();
       } else {
-        res.status(401).json({ mess: 'Bạn không có quyền' });
+        res.status(401).json({ mess: "Bạn không có quyền" });
       }
     });
   },
