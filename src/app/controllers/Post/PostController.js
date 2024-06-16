@@ -106,6 +106,19 @@ const PostController = {
       res.status(500).json(error);
     }
   },
+  getAllPost: async (req, res) => {
+    try {
+      const page = parseInt(req.query.page) || 1;
+      const pageSize = parseInt(req.query.pageSize) || 20;
+      const startIndex = (page - 1) * pageSize;
+      const totalItems = await Post.countDocuments();
+      const data = await Post.find().skip(startIndex).limit(pageSize);
+      res.status(200).json({ totalItems, data });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json(error);
+    }
+  },
   getPostById: async (req, res) => {
     try {
       const postDetail = await Post.find({ _id: req.params.id }).populate(

@@ -20,4 +20,5 @@ Router.put(
 );
 Router.get('/get-post', PostController.getListPost);
 Router.get('/get-detail/:id', PostController.getPostById);
+Router.get('/get-all-list-post',PostController.getAllPost)
 export default Router;
